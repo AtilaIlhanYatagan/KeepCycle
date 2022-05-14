@@ -115,8 +115,9 @@ class _CalculatorsPageState extends State<CalculatorsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black54,
       appBar: AppBar(
-        title: const Text('Sample Code'),
+        title: const Text('Calculators'),
       ),
       body: Center(
           child: Row(
@@ -134,6 +135,8 @@ class _CalculatorsPageState extends State<CalculatorsPage> {
                   ));
                 },
                 child: const Text('CalCalculator'),
+                style: ElevatedButton.styleFrom(
+                    fixedSize: const Size(130.0, 90.0)),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -144,6 +147,8 @@ class _CalculatorsPageState extends State<CalculatorsPage> {
                   ));
                 },
                 child: const Text('PlateCalculator'),
+                style: ElevatedButton.styleFrom(
+                    fixedSize: const Size(130.0, 90.0)),
               ),
             ],
           ),
@@ -159,6 +164,8 @@ class _CalculatorsPageState extends State<CalculatorsPage> {
                   ));
                 },
                 child: const Text('BMICalculator'),
+                style: ElevatedButton.styleFrom(
+                    fixedSize: const Size(130.0, 90.0)),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -169,6 +176,8 @@ class _CalculatorsPageState extends State<CalculatorsPage> {
                   ));
                 },
                 child: const Text('IWCalculator'),
+                style: ElevatedButton.styleFrom(
+                    fixedSize: const Size(130.0, 90.0)),
               ),
             ],
           ),
@@ -212,9 +221,9 @@ class _BMICalculatorState extends State<BMICalculator> {
   int _bodyWeight = 0;
   int _height = 0;
   double _BMI = 0;
-
-  double calculateBMI(int weight,int height){
-    return weight / (height*height/10000);
+  int _calculated = 0;
+  double calculateBMI(int weight, int height) {
+    return weight / (height * height / 10000);
   }
 
   final TextEditingController _weightController = TextEditingController();
@@ -233,56 +242,164 @@ class _BMICalculatorState extends State<BMICalculator> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('Calculated BMI $_BMI'),
+              Center(
+                child: Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text(
+                      'Calculated BMI ' + _BMI.toStringAsFixed(1),
+                      style: const TextStyle(fontSize: 22),
+                    )),
+              ),
+
+             // needs a fix (does not update the screen)
+             // calculated == 1 print canlculation results.
+             // if (_calculated == 1) BmiInfo(bmi: _BMI, height: _height),
+
               TextField(
                 controller: _heightController,
                 decoration: InputDecoration(
-                  hintText: 'Enter your height here (Ex:180)',
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      _heightController.clear();
-                    },
-                    icon: const Icon(Icons.delete),
-                  ),
-                  border: const OutlineInputBorder(),
-                  fillColor: Colors.lightBlue.shade100,
-                  filled : true
-                ),
+                    hintText: 'Enter your height here (Ex:180)',
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        _heightController.clear();
+                      },
+                      icon: const Icon(Icons.delete),
+                    ),
+                    border: const OutlineInputBorder(),
+                    fillColor: Colors.lightBlue.shade100,
+                    filled: true),
                 keyboardType: TextInputType.number,
                 maxLength: 3,
               ),
               TextField(
                 controller: _weightController,
                 decoration: InputDecoration(
-                  hintText: 'Enter your weight here (Ex:80)',
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      _weightController.clear();
-                    },
-                    icon: const Icon(Icons.delete),
-                  ),
-                  border: OutlineInputBorder(),
-                  fillColor: Colors.lightBlue.shade100,
-                  filled : true
-                ),
+                    hintText: 'Enter your weight here (Ex:80)',
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        _weightController.clear();
+                      },
+                      icon: const Icon(Icons.delete),
+                    ),
+                    border: OutlineInputBorder(),
+                    fillColor: Colors.lightBlue.shade100,
+                    filled: true),
                 keyboardType: TextInputType.number,
                 maxLength: 3,
               ),
-              ElevatedButton.icon(
-                  label: const Text('Calculate'),
-                  icon: const Icon(Icons.add, color: Colors.white),
-                  onPressed: //(_weightController.text.isEmpty || _heightController.text.isEmpty)  ? null :
-                      () {
-                  setState(() {
-                    _height = int.parse(_heightController.text);
-                    _bodyWeight = int.parse(_weightController.text);
-                    _BMI = calculateBMI(_bodyWeight, _height);
-                  });
-                  print(_BMI);
-                  }),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ElevatedButton.icon(
+                        label: const Text('Calculate'),
+                        icon: const Icon(Icons.add, color: Colors.white),
+                        onPressed: //(_weightController.text.isEmpty || _heightController.text.isEmpty)  ? null :
+                            () {
+                          setState(() {
+                            _height = int.parse(_heightController.text);
+                            _bodyWeight = int.parse(_weightController.text);
+                            _BMI = calculateBMI(_bodyWeight, _height);
+                            _calculated = 1;
+                          });
+                        }),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ElevatedButton.icon(
+                        label: const Text('Reset'),
+                        icon: const Icon(Icons.clear, color: Colors.red),
+                        onPressed: //(_weightController.text.isEmpty || _heightController.text.isEmpty)  ? null :
+                            () {
+                          setState(() {
+                            _height = 0;
+                            _bodyWeight = 0;
+                            _BMI = 0;
+                            _calculated = 0;
+                            _weightController.clear();
+                            _heightController.clear();
+                          });
+                        }),
+                  ),
+                ],
+              ),
             ],
           ),
         ));
+  }
+}
+
+class BmiInfo extends StatefulWidget {
+  final double bmi;
+  final int height;
+  const BmiInfo({
+    Key? key,
+    required this.bmi,
+    required this.height,
+  }) : super(key: key);
+
+  @override
+  State<BmiInfo> createState() => _BmiInfoState();
+}
+
+class _BmiInfoState extends State<BmiInfo> {
+  late final String info;
+  late final double idealWeightUpperLimit;
+  late final double idealWeightDownLimit;
+  String setInfo() {
+    if (widget.bmi < 18.5) {
+      return 'You are underweight';
+    } else if (widget.bmi > 18.5 && widget.bmi < 24.9) {
+      return 'Your weight is ideal';
+    } else if (widget.bmi > 25 && widget.bmi < 29.9) {
+      return 'You are underweight';
+    } else if (widget.bmi > 30) {
+      return 'You are obese';
+    }
+    return '';
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    info = setInfo();
+    idealWeightDownLimit = (widget.height) * (widget.height) * (18.5 / 10000);
+    idealWeightUpperLimit = (widget.height) * (widget.height) * (24.9 / 10000);
+  }
+
+  @override
+  void didUpdateWidget(covariant BmiInfo oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+    if((oldWidget.bmi != widget.bmi) || (oldWidget.height != widget.height)) {
+      setState(() {
+        info = setInfo();
+        idealWeightDownLimit = (widget.height) * (widget.height) * (18.5 / 10000);
+        idealWeightUpperLimit = (widget.height) * (widget.height) * (24.9 / 10000);
+      });
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        children: [
+          Container(
+              padding: const EdgeInsets.only(bottom: 5.0),
+              child: Text(info)
+          ),
+          Container(
+              padding: const EdgeInsets.only(bottom: 5.0),
+              child: Text('Your ideal weight is between ' +
+                  idealWeightDownLimit.toStringAsFixed(1) + ' and ' +
+                  idealWeightUpperLimit.toStringAsFixed(1) +'.'
+              )
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -319,40 +436,44 @@ class IWCalculator extends StatefulWidget {
 class _IWCalculatorState extends State<IWCalculator> {
   bool _male = false;
   bool _female = false;
-  int _bodyWeight = 0;
   int _height = 0;
   double _idealWeight = 0;
 
   //Ideal body weight is computed in
   // men as 50 + (0.91 × [height in centimeters − 152.4])
   // and in women as 45.5 + (0.91 × [height in centimeters − 152.4]).
-  double calculateIW (int height,bool male,bool female){
-    if(male == true){
-      return (50 + (0.91)*(height-152.4));
-    }
-    else if(female == true){
-      return (50 + (0.91)*(height-152.4));
+  double calculateIW(int height, bool male, bool female) {
+    if (male == true) {
+      return (50 + (0.91) * (height - 152.4));
+    } else if (female == true) {
+      return (50 + (0.91) * (height - 152.4));
     }
     return 0;
   }
 
-  final TextEditingController _weightController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey,
-      appBar: AppBar(
-        title: const Text('Sample Code'),
-      ),
+        backgroundColor: Colors.blueGrey,
+        appBar: AppBar(
+          title: const Text('Sample Code'),
+        ),
         body: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('Calculated Ideal Weight: $_idealWeight'),
+              Center(
+                child: Container(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Text(
+                        "Calculated Ideal Weight: " +
+                            _idealWeight.toStringAsFixed(1),
+                        style: const TextStyle(fontSize: 22))),
+              ),
               TextField(
                 controller: _heightController,
                 decoration: InputDecoration(
@@ -365,65 +486,70 @@ class _IWCalculatorState extends State<IWCalculator> {
                     ),
                     border: const OutlineInputBorder(),
                     fillColor: Colors.lightBlue.shade100,
-                    filled : true
-                ),
+                    filled: true),
                 keyboardType: TextInputType.number,
                 maxLength: 3,
               ),
-              TextField(
-                controller: _weightController,
-                decoration: InputDecoration(
-                    hintText: 'Enter your weight here (Ex:80)',
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        _weightController.clear();
-                      },
-                      icon: const Icon(Icons.delete),
-                    ),
-                    border: OutlineInputBorder(),
-                    fillColor: Colors.lightBlue.shade100,
-                    filled : true
-                ),
-                keyboardType: TextInputType.number,
-                maxLength: 3,
-              ),
-
               CheckboxListTile(
-                  title: Text('male'),
-                  secondary: Icon(Icons.male),
+                  title: const Text('male'),
+                  secondary: const Icon(Icons.male),
                   controlAffinity: ListTileControlAffinity.leading,
-                  value: _male, onChanged: (value){
-                setState(() {
-                  _male = value!;
-                  _female = false;
-                });
-              }),
-              CheckboxListTile(
-                  title: Text('female'),
-                  secondary: Icon(Icons.female),
-                  controlAffinity: ListTileControlAffinity.leading,
-                  value: _female, onChanged: (value){
-                setState(() {
-                  _female = value!;
-                  _male = false;
-                });
-              }),
-
-              ElevatedButton.icon(
-                  label: const Text('Calculate'),
-                  icon: const Icon(Icons.add, color: Colors.white),
-                  onPressed: //(_weightController.text.isEmpty || _heightController.text.isEmpty)  ? null :
-                      () {
+                  tileColor: Colors.lightBlue.shade100,
+                  value: _male,
+                  onChanged: (value) {
                     setState(() {
-                      _height = int.parse(_heightController.text);
-                     // _bodyWeight = int.parse(_weightController.text);
-                      _idealWeight = calculateIW(_height, _male, _female);
+                      _male = value!;
+                      _female = false;
                     });
-
                   }),
+              CheckboxListTile(
+                  title: const Text('female'),
+                  secondary: const Icon(Icons.female),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  tileColor: Colors.lightBlue.shade100,
+                  value: _female,
+                  onChanged: (value) {
+                    setState(() {
+                      _female = value!;
+                      _male = false;
+                    });
+                  }),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ElevatedButton.icon(
+                        label: const Text('Calculate'),
+                        icon: const Icon(Icons.add, color: Colors.white),
+                        onPressed: //(_weightController.text.isEmpty || _heightController.text.isEmpty)  ? null :
+                            () {
+                          setState(() {
+                            _height = int.parse(_heightController.text);
+                            // _bodyWeight = int.parse(_weightController.text);
+                            _idealWeight = calculateIW(_height, _male, _female);
+                          });
+                        }),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ElevatedButton.icon(
+                        label: const Text('Reset'),
+                        icon: const Icon(Icons.clear, color: Colors.red),
+                        onPressed: //(_weightController.text.isEmpty || _heightController.text.isEmpty)  ? null :
+                            () {
+                          setState(() {
+                            _height = 0;
+                            _heightController.clear();
+                            _male = false;
+                            _female = false;
+                          });
+                        }),
+                  ),
+                ],
+              ),
             ],
           ),
-        )
-    );
+        ));
   }
 }
